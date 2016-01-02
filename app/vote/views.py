@@ -45,7 +45,8 @@ def question(id):
         flash("You're not registered")
         return redirect(url_for('.inputID'))
 
-    #definition question and user content
+    #definition question and user answer content
+    question_all = Question.query.all()
     question = Question.query.get(id)
     user_answer = User_answer.query.filter_by(user_id=session['user_id']).all()
 
@@ -58,6 +59,10 @@ def question(id):
         return redirect(url_for('.question', id=next_post(id)))
     if id == 0:
         return redirect(url_for('.thanks'))
+    #handle if id question not in DATABASE
+    if not question:
+        flash("Question ID is not in database")
+        return redirect(url_for('.question', id=1))
     #handle repeat answer
     for a in user_answer:
         if question.id == a.question_id:
