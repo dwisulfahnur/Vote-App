@@ -1,0 +1,9 @@
+.jumbotron {
+    text-align: center;
+    padding-top: 30px;
+    padding-bottom: 95px;
+    margin-bottom: 30px;
+    height: 600px; 
+    color: inherit;
+    background-color: #eee;
+}

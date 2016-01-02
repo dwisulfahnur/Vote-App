@@ -1,0 +1,8 @@
+Flask
+Flask-Migrate
+Flask-Script
+Flask-SQLAlchemy
+Flask-WTF
+python-editor==0.4
+SQLAlchemy==1.0.8
+WTForms==2.0.2
