@@ -42,7 +42,7 @@ def next_post(id):
 def question(id):
     #check session
     if "user_id" not in session:
-        flash("You're not registered")
+        flash("You're not registered, Enter your date if you wanto register")
         return redirect(url_for('.inputID'))
 
     #definition question and user answer content
@@ -63,7 +63,7 @@ def question(id):
     if not question:
         flash("Question ID is not in database")
         return redirect(url_for('.question', id=1))
-    #handle repeat answer
+    #handle for repeat answer
     for a in user_answer:
         if question.id == a.question_id:
             return redirect(url_for('.question', id=next_post(question.id)))
