@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash, abort
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from app.core.db import db
 from .forms import InputID
 from .models import User, Question, User_answer
@@ -24,31 +24,24 @@ def inputID():
     #handle GET method
     return render_template('inputID.html', form=form)
 
-def next_post(id):
-    count = Question.query.count()
-    while (count > 0):
-        next_post = None
-        id += 1
-        if Question.query.get(id) is not None:
-            next_post = Question.query.get(id)
-            return next_post.id
-            break
-        if id > count:
-            return 0
-        count += 1
 
 #vote route
-@vote_views.route('/question/<int:id>/', methods=['POST', 'GET'])
+@vote_views.route('/question/', defaults={'id':1}, methods=['POST', 'GET'])
+@vote_views.route('/question/<id>', methods=['POST', 'GET'])
 def question(id):
     #check session
     if "user_id" not in session:
         flash("You're not registered, Enter your date if you wanto register")
         return redirect(url_for('.inputID'))
 
-    #definition question and user answer content
-    question_all = Question.query.all()
+    ####Handle question view####
     question = Question.query.get(id)
-    user_answer = User_answer.query.filter_by(user_id=session['user_id']).all()
+    for x in Question.query.all():
+        if not User_answer.query.filter_by(user_id=session['user_id'], question_id=x.id).first():
+            question = Question.query.get(x.id)
+            break
+    else:
+        return redirect(url_for('.thanks'))
 
     #handle post method
     if request.method == "POST":
@@ -56,18 +49,9 @@ def question(id):
         else: answer = 0
         db.session.add(User_answer(session["user_id"], question.id, answer))
         db.session.commit()
-        return redirect(url_for('.question', id=next_post(id)))
-    if id == 0:
-        return redirect(url_for('.thanks'))
-    #handle if id question not in DATABASE
-    if not question:
-        flash("Question ID is not in database")
         return redirect(url_for('.question', id=1))
-    #handle for repeat answer
-    for a in user_answer:
-        if question.id == a.question_id:
-            return redirect(url_for('.question', id=next_post(question.id)))
-    #handle get method
+
+    ### HANDLE GET METHOD ###
     return render_template('question.html', question=question)
 
 @vote_views.route('/thanks/')
